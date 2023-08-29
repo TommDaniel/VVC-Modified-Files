@@ -68,8 +68,9 @@ void BinEncoderbyme::exportBins(){  //by me
    mean_bypass  = burst_bypass  / count_bypass;
   } 
   float total_cycle = bypass_cycle+regular_cycle;
-  float media_bypass = bypass_cycle/total_cycle;
-  float media_regular = bypass_cycle/total_cycle;
+  float media_bypass = total_cycle/bypass_cycle;
+  float media_regular = total_cycle/regular_cycle;
+  float vazao = (burst_regular+burst_bypass)/total_cycle;
   //by me     
    ofstream myfile;
   myfile.open("contador2.txt",std::fstream::app); 
@@ -82,6 +83,7 @@ void BinEncoderbyme::exportBins(){  //by me
   myfile << "Average calls BYPASS: " << mean_bypass << "\n";
   myfile << "REGULAR Cycle: " << media_regular << "\n";
   myfile << "BYPASS Cycle: " << media_bypass << "\n";
+  myfile << "Vazao: " << vazao << "\n";
   myfile << "\n";
   myfile.close();
 }
@@ -209,16 +211,15 @@ void BinEncoderBase::encodeBinEP( unsigned bin )
     writeOut();
   }
   //by me
-  
+  flag_cycle+=1;
+    if(flag_cycle == 2){
+      bypass_cycle+=1;
+      flag_cycle=0;
+    }
   flag_regular = false;
   burst_bypass += 1;
   if (!flag_bypass)
   {
-    count+=1;
-    if(count == 2){
-      bypass_cycle+=1;
-      flag_cycle=0;
-    }
     count_bypass += 1;
     flag_bypass = true;
   }
@@ -264,12 +265,7 @@ void BinEncoderBase::encodeBinsEP( unsigned bins, unsigned numBins )
   if(numBins>0){
 
     //by me
-    flag_regular = false;;
-    burst_bypass += numBins;
-    if (!flag_bypass)
-    {
-      
-      if(numBins%2==0){
+    if(numBins%2==0){
         bypass_cycle = bypass_cycle + (numbins/2); 
       }else{
         bypass_cycle = bypass_cycle +((numbins-1)/2);
@@ -279,6 +275,9 @@ void BinEncoderBase::encodeBinsEP( unsigned bins, unsigned numBins )
         	flag_cycle=0;
 		}
       }
+    flag_regular = false;;
+    burst_bypass += numBins;
+    if (!flag_bypass){
       count_bypass += 1;
       flag_bypass = true;
     }
@@ -483,7 +482,6 @@ void TBinEncoder<BinProbModel>::encodeBin( unsigned bin, unsigned ctxId )
   burst_regular += 1;
   if (!flag_regular)
   {
-    
     count_regular += 1;
     flag_regular = true;
   }
