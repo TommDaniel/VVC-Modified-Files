@@ -69,7 +69,7 @@ void BinEncoderbyme::exportBins(){  //by me
    mean_bypass  = burst_bypass  / count_bypass;
   } 
   float total_cycle = bypass_cycle+regular_cycle;
-  float media_bypass=0.00,media_regular=0.00,vazao=0.00;
+  float media_bypass=0,media_regular=0,vazao=0;
   if(burst_bypass > 0 && burst_regular > 0){
     media_bypass = burst_bypass/bypass_cycle;
     media_regular = burst_regular/regular_cycle;
