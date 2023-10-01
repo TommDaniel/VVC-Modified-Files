@@ -54,9 +54,12 @@ float mean_regular = 0.00;
 float mean_bypass = 0.00;
 bool flag_bypass;
 bool flag_regular;
-unsigned int flag_cycle=0;
-float bypass_cycle = 0, regular_cycle=0;
-
+unsigned int flag_cycle_2=0;
+unsigned int flag_cycle_3=0;
+unsigned int flag_cycle_4=0;
+float bypass_cycle_2 = 0, regular_cycle_2=0;
+float bypass_cycle_3 = 0, regular_cycle_3=0;
+float bypass_cycle_4 = 0, regular_cycle_4=0;
 
 void BinEncoderbyme::exportBins(){  //by me
       //by me
@@ -68,26 +71,53 @@ void BinEncoderbyme::exportBins(){  //by me
   {
    mean_bypass  = burst_bypass  / count_bypass;
   } 
-  float total_cycle = bypass_cycle+regular_cycle;
-  float media_bypass=0,media_regular=0,vazao=0;
+
+  //for 2 bypass
+  float total_cycle_2 = bypass_cycle_2+regular_cycle_2;
+  float media_bypass_2=0,media_regular_2=0,vazao_2=0;
   if(burst_bypass > 0 && burst_regular > 0){
-    media_bypass = burst_bypass/bypass_cycle;
-    media_regular = burst_regular/regular_cycle;
-    vazao = (burst_regular+burst_bypass)/total_cycle;
+    media_bypass_2 = burst_bypass/bypass_cycle_2;
+    media_regular_2 = burst_regular/regular_cycle_2;
+    vazao_2 = (burst_regular+burst_bypass)/total_cycle_2;
   }
+
+  //for 3 bypass
+  float total_cycle_3 = bypass_cycle_3+regular_cycle_3;
+  float media_bypass_3=0,media_regular_3=0,vazao_3=0;
+  if(burst_bypass > 0 && burst_regular > 0){
+    media_bypass_3 = burst_bypass/bypass_cycle_3;
+    media_regular_3 = burst_regular/regular_cycle_3;
+    vazao_3 = (burst_regular+burst_bypass)/total_cycle_3;
+  }
+
+  //for 4 bypass
+  float total_cycle_4 = bypass_cycle_4+regular_cycle_4;
+  float media_bypass_4=0,media_regular_4=0,vazao_4=0;
+  if(burst_bypass > 0 && burst_regular > 0){
+    media_bypass_4 = burst_bypass/bypass_cycle_4;
+    media_regular_4 = burst_regular/regular_cycle_4;
+    vazao_4 = (burst_regular+burst_bypass)/total_cycle_4;
+  }
+
   //by me     
    ofstream myfile;
   myfile.open("contador2.txt",std::fstream::app); 
-  myfile << "contEncodeBinEP:" << contEncodeBinEP << "\n ";
+  /*myfile << "contEncodeBinEP:" << contEncodeBinEP << "\n ";
   myfile << "contEncodeBin :" << contEncodeBin  << "\n"; 
   myfile << "contEncodeBinTrm :" << contEncodeBinTrm  << "\n"; 
   myfile << "Total burst REGULAR: " << count_regular << "\n";
   myfile << "Total burst BYPASS: " << count_bypass << "\n";
   myfile << "Average calls REGULAR: " << mean_regular << "\n";
-  myfile << "Average calls BYPASS: " << mean_bypass << "\n";
-  myfile << "REGULAR Cycle: " << media_regular << "\n";
-  myfile << "BYPASS Cycle: " << media_bypass << "\n";
-  myfile << "Vazao: " << vazao << "\n";
+  myfile << "Average calls BYPASS: " << mean_bypass << "\n";*/
+  myfile << "REGULAR Cycle 2: " << media_regular_2 << "\n";
+  myfile << "BYPASS Cycle 2: " << media_bypass_2 << "\n";
+  myfile << "Vazao 2: " << vazao_2 << "\n";
+  myfile << "REGULAR Cycle 3: " << media_regular_3 << "\n";
+  myfile << "BYPASS Cycle 3: " << media_bypass_3 << "\n";
+  myfile << "Vazao 3: " << vazao_3 << "\n";
+  myfile << "REGULAR Cycle 4: " << media_regular_4 << "\n";
+  myfile << "BYPASS Cycle 4: " << media_bypass_4 << "\n";
+  myfile << "Vazao 4: " << vazao_4 << "\n";
   myfile << "\n";
   myfile.close();
 }
@@ -215,11 +245,11 @@ void BinEncoderBase::encodeBinEP( unsigned bin )
     writeOut();
   }
   //by me
-  flag_cycle+=1;
-    if(flag_cycle == 2){
-      bypass_cycle+=1;
-      flag_cycle=0;
-    }
+  flag_cycle_2+=1;
+  if(flag_cycle_2 == 2){
+    bypass_cycle_2+=1;
+    flag_cycle_2=0;
+  }
   flag_regular = false;
   burst_bypass += 1;
   if (!flag_bypass)
@@ -269,16 +299,55 @@ void BinEncoderBase::encodeBinsEP( unsigned bins, unsigned numBins )
   if(numBins>0){
 
     //by me
+
+    //for 2 bypass
     if(numBins%2==0){
-        bypass_cycle = bypass_cycle + (numBins/2); 
+        bypass_cycle_2 = bypass_cycle_2 + (numBins/2); 
       }else{
-        bypass_cycle = bypass_cycle +((numBins-1)/2);
-        flag_cycle+=1;
-        if(flag_cycle==2){
-        	bypass_cycle+=1;
-        	flag_cycle=0;
-		}
-      }
+        bypass_cycle_2 = bypass_cycle_2 +((numBins-1)/2);
+        flag_cycle_2+=1;
+        if(flag_cycle_2==2){
+        	bypass_cycle_2+=1;
+        	flag_cycle_2=0;
+		    }
+    }
+
+    //for 3 bypass
+    if(numBins%2==1 && numBins>=3){
+      bypass_cycle_3 = bypass_cycle_3 + (numBins/3); 
+    }
+    if(numBins < 3){
+      flag_cycle_3+= numBins;
+
+    }
+    if(numBins%2==0 && numBins>3){
+      bypass_cycle_3 = bypass_cycle_3 +((numBins-1)/3);
+      flag_cycle_3+=1;
+      
+    }
+    if(flag_cycle_3==3){
+      bypass_cycle_3+=1;
+      flag_cycle_3=0;
+    }
+
+    //for 4 bypass
+    if(numBins%2==0 && numBins>=4){
+      bypass_cycle_4 = bypass_cycle_4 + (numBins/4); 
+    }
+    if(numBins < 4){
+      flag_cycle_4+= numBins;
+
+    }
+    if(numBins%2==1 && numBins>4){
+      bypass_cycle_4 = bypass_cycle_4 +((numBins-1)/4);
+      flag_cycle_4+=1;
+      
+    }
+    if(flag_cycle_4==4){
+      bypass_cycle_4+=1;
+      flag_cycle_4=0;
+    }
+
     flag_regular = false;;
     burst_bypass += numBins;
     if (!flag_bypass){
@@ -477,11 +546,27 @@ void TBinEncoder<BinProbModel>::encodeBin( unsigned bin, unsigned ctxId )
   BinEncoderBase::m_binStore.addBin(bin, ctxId);
 
   //by me
-  if(flag_cycle == 1){
-    bypass_cycle+=1;
-    flag_cycle=0;
+  //for 2 bypass
+  if(flag_cycle_2 != 0){
+    bypass_cycle_2+=1;
+    flag_cycle_2=0;
   }
-  regular_cycle+=1;
+  regular_cycle_2+=1;
+
+  //for 3 bypass
+  if(flag_cycle_3 != 0){
+    bypass_cycle_3+=1;
+    flag_cycle_3=0;
+  }
+  regular_cycle_3+=1;
+
+  //for 4 bypass
+  if(flag_cycle_4 != 0){
+    bypass_cycle_4+=1;
+    flag_cycle_4=0;
+  }
+  regular_cycle_4+=1;
+
   flag_bypass = false; 
   burst_regular += 1;
   if (!flag_regular)
